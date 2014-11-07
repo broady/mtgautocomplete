@@ -1,6 +1,7 @@
 yucky.
 
     $ gopherjs build main_js.go suggest.go
+    $ java -jar compiler.jar --js suggest.js > suggest.min.js
     or
     $ go run main.go suggest.go
 
