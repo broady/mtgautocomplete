@@ -1,0 +1,7 @@
+yucky.
+
+    $ gopherjs build main_js.go suggest.go
+    or
+    $ go run main.go suggest.go
+
+    $ go run convert_main.go < AllCards.json > data
