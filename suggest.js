@@ -3131,7 +3131,8 @@ $packages["strings"] = (function() {
 $packages["main"] = (function() {
 	var $pkg = {}, strings = $packages["strings"], patricia = $packages["github.com/tchap/go-patricia/patricia"], js = $packages["github.com/gopherjs/gopherjs/js"], model, populate, suggestion, main;
 	populate = function(cards) {
-		var _ref, _i, cn, fields, _ref$1, _i$1, i, prefix;
+		var prefixes, _ref, _i, cn, fields, _ref$1, _i$1, i, prefix, _entry, results, _key;
+		prefixes = new $Map();
 		_ref = cards;
 		_i = 0;
 		while (_i < _ref.$length) {
@@ -3141,8 +3142,16 @@ $packages["main"] = (function() {
 			_i$1 = 0;
 			while (_i$1 < _ref$1.$length) {
 				i = _i$1;
-				prefix = strings.Join($subslice(fields, i, fields.$length), " ");
-				model.Insert(new patricia.Prefix($stringToBytes(strings.ToLower(prefix))), new $String(cn));
+				prefix = strings.ToLower(strings.Join($subslice(fields, i, fields.$length), " "));
+				results = (_entry = prefixes[prefix], _entry !== undefined ? _entry.v : ($sliceType($String)).nil);
+				if (results === ($sliceType($String)).nil) {
+					results = ($sliceType($String)).make(0);
+				} else {
+					model.Delete(new patricia.Prefix($stringToBytes(prefix)));
+				}
+				results = $append(results, cn);
+				_key = prefix; (prefixes || $throwRuntimeError("assignment to entry in nil map"))[_key] = { k: _key, v: results };
+				model.Insert(new patricia.Prefix($stringToBytes(prefix)), results);
 				_i$1++;
 			}
 			_i++;
@@ -3152,7 +3161,15 @@ $packages["main"] = (function() {
 		var suggestions;
 		suggestions = ($sliceType($String)).make(0);
 		model.VisitSubtree(new patricia.Prefix($stringToBytes(strings.ToLower(s))), (function(prefix, item) {
-			suggestions = $append(suggestions, $assertType(item, $String));
+			var results, _ref, _i, result;
+			results = $assertType(item, ($sliceType($String)));
+			_ref = results;
+			_i = 0;
+			while (_i < _ref.$length) {
+				result = ((_i < 0 || _i >= _ref.$length) ? $throwRuntimeError("index out of range") : _ref.$array[_ref.$offset + _i]);
+				suggestions = $append(suggestions, result);
+				_i++;
+			}
 			return $ifaceNil;
 		}));
 		return suggestions;
